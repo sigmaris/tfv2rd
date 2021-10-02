@@ -1,5 +1,6 @@
 // Definitions of reviewdog diagnostic format
 use serde::Serialize;
+use serde_json::value::RawValue;
 
 // Result of diagnostic tool such as a compiler or a linter.
 // It's intended to be used as top-level structured format which represents a
@@ -24,7 +25,7 @@ pub struct DiagnosticResult<'a> {
 #[derive(Debug, Serialize)]
 pub struct Diagnostic<'a> {
     // The diagnostic's message.
-    pub message: &'a str,
+    pub message: &'a RawValue,
 
     // Location at which this diagnostic message applies.
     pub location: Location,
@@ -49,7 +50,7 @@ pub struct Diagnostic<'a> {
     // original_output represents the original output which corresponds to this
     // diagnostic.
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub original_output: Option<&'a str>,
+    pub original_output: Option<&'a RawValue>,
 }
 
 #[derive(Debug, Serialize)]

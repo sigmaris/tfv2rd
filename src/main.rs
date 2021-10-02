@@ -12,7 +12,7 @@ fn convert<'a>(r: &'a tf::ValidateResult) -> io::Result<reviewdog::DiagnosticRes
             .iter()
             .filter_map(|diag| {
                 diag.range.as_ref().map(|has_range| rd::Diagnostic {
-                    message: &diag.summary,
+                    message: diag.summary,
                     location: rd::Location {
                         path: has_range.filename.to_string(),
                         range: has_range.start.as_ref().map(|has_start| rd::Range {
@@ -35,7 +35,7 @@ fn convert<'a>(r: &'a tf::ValidateResult) -> io::Result<reviewdog::DiagnosticRes
                     source: None,
                     code: None,
                     suggestions: Vec::new(),
-                    original_output: diag.detail.as_ref().map(Borrow::borrow),
+                    original_output: diag.detail,
                 })
             })
             .collect(),
