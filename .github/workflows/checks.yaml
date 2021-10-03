@@ -59,7 +59,7 @@ jobs:
           else
             REPORTER="github-check"
           fi
-          cargo clippy --message-format json 2>&1 | clippy-reviewdog-filter reviewdog -f=checkstyle -reporter=$REPORTER
+          cargo clippy --message-format json 2>&1 | clippy-reviewdog-filter | reviewdog -f=checkstyle -reporter=$REPORTER
 
       - name: Run cargo fmt
         uses: actions-rs/cargo@v1
