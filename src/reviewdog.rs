@@ -54,11 +54,12 @@ pub struct Diagnostic<'a> {
 }
 
 #[derive(Debug, Serialize)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum Severity {
-    UNKNOWN_SEVERITY,
-    ERROR,
-    WARNING,
-    INFO,
+    UnknownSeverity,
+    Error,
+    Warning,
+    Info,
 }
 
 #[derive(Debug, Serialize)]
