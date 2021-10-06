@@ -237,28 +237,34 @@ fn make_path_converter(opt: &Opt) -> Result<PathConverter, io::Error> {
 
 #[cfg(test)]
 mod tests {
+    use jsonschema::{Draft, JSONSchema};
     use serde_json::json;
 
     use super::*;
-    use std::error::Error;
+
+    static RD_SCHEMA: &str = include_str!("../testdata/DiagnosticResult.jsonschema");
+    static TF_NO_RANGE: &str = include_str!("../testdata/no_range.json");
+    static TF_MODS_IN_PARENT: &str = include_str!("../testdata/modules_parent_dir.json");
+    static TF_QUOTING: &str = include_str!("../testdata/quoting.json");
+
+    fn passthru_path(s: &str) -> Result<String, io::Error> {
+        Ok(s.to_owned())
+    }
 
     #[test]
-    fn test_no_range() -> Result<(), Box<dyn Error>> {
-        let tf_no_range = include_str!("../testdata/no_range.json");
-        let result: tf::ValidateResult = serde_json::from_str(tf_no_range)?;
-        let all_diags = convert(
-            &result,
-            &Box::new(|s: &str| Ok(s.to_owned())),
-            false,
-            "test_no_range",
-        )?;
+    fn test_no_range() {
+        let result: tf::ValidateResult =
+            serde_json::from_str(TF_NO_RANGE).expect("Test data should be parsed");
+        let all_diags = convert(&result, &Box::new(passthru_path), false, "test_no_range")
+            .expect("Test data should be converted");
         assert_eq!(
             all_diags.len(),
             1,
             "Only one out of the two diagnostics should be included"
         );
         assert_eq!(
-            serde_json::to_value(all_diags.iter().next().unwrap())?,
+            serde_json::to_value(all_diags.iter().next().unwrap())
+                .expect("Converted data should be serialized"),
             json!({
                 "message": "Invalid quoted type constraints",
                 "location": {
@@ -273,6 +279,83 @@ mod tests {
                 "original_output": "Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Terraform. Remove the quotes around \"string\"."
             })
         );
-        Ok(())
+    }
+
+    #[test]
+    fn test_quoting_errors() {
+        let result: tf::ValidateResult =
+            serde_json::from_str(TF_QUOTING).expect("Test data should be parsed");
+        let all_diags = convert(&result, &Box::new(passthru_path), false, "test_quoting")
+            .expect("Test data should be converted");
+        assert_eq!(
+            all_diags.len(),
+            2,
+            "Two diagnostics should be included"
+        );
+        assert_eq!(
+            serde_json::to_value(all_diags)
+                .expect("Converted data should be serialized"),
+            json!([
+                {
+                    "message": "Invalid quoted type constraints",
+                    "location": {
+                        "path": "variables.tf",
+                        "range": {
+                            "start": {"line": 2,"column": 17},
+                            "end": {"line": 2, "column": 25}
+                        }
+                    },
+                    "severity": "ERROR",
+                    "source": {"name": "test_quoting"},
+                    "original_output": "Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Terraform. Remove the quotes around \"string\"."
+                },
+                {
+                    "message": "Invalid quoted type constraints",
+                    "location": {
+                        "path": "variables.tf",
+                        "range": {
+                            "start": {"line": 8,"column": 17},
+                            "end": {"line": 8, "column": 25}
+                        }
+                    },
+                    "severity": "ERROR",
+                    "source": {"name": "test_quoting"},
+                    "original_output": "Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Terraform. Remove the quotes around \"string\"."
+                },
+            ])
+        );
+    }
+
+    #[test]
+    fn schema_validate_output() {
+        let compiled_schema = JSONSchema::options()
+            .with_draft(Draft::Draft4)
+            .compile(&serde_json::from_str(RD_SCHEMA).expect("Schema should be parsed"))
+            .expect("A valid schema");
+        for input in [TF_MODS_IN_PARENT, TF_NO_RANGE, TF_QUOTING] {
+            let tf_in: tf::ValidateResult =
+                serde_json::from_str(input).expect("Test data can be parsed");
+            let all_diags = convert(
+                &tf_in,
+                &Box::new(passthru_path),
+                false,
+                "schema_validate_output",
+            )
+            .expect("Diagnostics can be converted");
+            let rd_diag = rd::DiagnosticResult {
+                diagnostics: all_diags,
+                severity: Some(rd::Severity::Error),
+                source: Some(Source {
+                    name: "schema_validate_output",
+                    url: None,
+                }),
+            };
+            compiled_schema
+                .validate(
+                    &serde_json::to_value(rd_diag).expect("DiagnosticResult can be serialized"),
+                )
+                .map_err(|d| d.collect::<Vec<_>>())
+                .expect("DiagnosticResult conforms to RdJSON schema");
+        }
     }
 }

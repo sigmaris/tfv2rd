@@ -1,0 +1,86 @@
+{
+  "format_version": "0.1",
+  "valid": false,
+  "error_count": 3,
+  "warning_count": 0,
+  "diagnostics": [
+    {
+      "severity": "error",
+      "summary": "Unsupported block type",
+      "detail": "Blocks of type \"varable\" are not expected here. Did you mean \"variable\"?",
+      "range": {
+        "filename": "../modules/blah/variables.tf",
+        "start": {
+          "line": 1,
+          "column": 1,
+          "byte": 0
+        },
+        "end": {
+          "line": 1,
+          "column": 8,
+          "byte": 7
+        }
+      },
+      "snippet": {
+        "context": null,
+        "code": "varable \"old_domain\" {",
+        "start_line": 1,
+        "highlight_start_offset": 0,
+        "highlight_end_offset": 7,
+        "values": []
+      }
+    },
+    {
+      "severity": "error",
+      "summary": "Missing required argument",
+      "detail": "The argument \"runtime\" is required, but no definition was found.",
+      "range": {
+        "filename": "../modules/blah/main.tf",
+        "start": {
+          "line": 1,
+          "column": 56,
+          "byte": 55
+        },
+        "end": {
+          "line": 1,
+          "column": 57,
+          "byte": 56
+        }
+      },
+      "snippet": {
+        "context": "resource \"aws_cloudfront_function\" \"redirect_requests\"",
+        "code": "resource \"aws_cloudfront_function\" \"redirect_requests\" {",
+        "start_line": 1,
+        "highlight_start_offset": 55,
+        "highlight_end_offset": 56,
+        "values": []
+      }
+    },
+    {
+      "severity": "error",
+      "summary": "Unsupported argument",
+      "detail": "An argument named \"runime\" is not expected here. Did you mean \"runtime\"?",
+      "range": {
+        "filename": "../modules/blah/main.tf",
+        "start": {
+          "line": 3,
+          "column": 3,
+          "byte": 89
+        },
+        "end": {
+          "line": 3,
+          "column": 9,
+          "byte": 95
+        }
+      },
+      "snippet": {
+        "context": "resource \"aws_cloudfront_function\" \"redirect_requests\"",
+        "code": "  runime = \"cloudfront-js-1.0\"",
+        "start_line": 3,
+        "highlight_start_offset": 2,
+        "highlight_end_offset": 8,
+        "values": []
+      }
+    }
+  ]
+}
