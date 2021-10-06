@@ -154,7 +154,7 @@ where
 fn main() -> io::Result<()> {
     pretty_env_logger::init();
     let opt = Opt::from_args();
-    let path_converter: Box<dyn Fn(&str) -> io::Result<String>> = make_path_converter(&opt)?;
+    let path_converter: PathConverter = make_path_converter(&opt)?;
 
     let mut input = String::with_capacity(128);
     io::stdin().read_to_string(&mut input)?;
@@ -233,4 +233,46 @@ fn make_path_converter(opt: &Opt) -> Result<PathConverter, io::Error> {
         // If we have no workdir we can only pass the paths straight through
         Box::new(|filename| Ok(filename.to_owned()))
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use serde_json::json;
+
+    use super::*;
+    use std::error::Error;
+
+    #[test]
+    fn test_no_range() -> Result<(), Box<dyn Error>> {
+        let tf_no_range = include_str!("../testdata/no_range.json");
+        let result: tf::ValidateResult = serde_json::from_str(tf_no_range)?;
+        let all_diags = convert(
+            &result,
+            &Box::new(|s: &str| Ok(s.to_owned())),
+            false,
+            "test_no_range",
+        )?;
+        assert_eq!(
+            all_diags.len(),
+            1,
+            "Only one out of the two diagnostics should be included"
+        );
+        assert_eq!(
+            serde_json::to_value(all_diags.iter().next().unwrap())?,
+            json!({
+                "message": "Invalid quoted type constraints",
+                "location": {
+                    "path": "variables.tf",
+                    "range": {
+                        "start": {"line": 8,"column": 17},
+                        "end": {"line": 8, "column": 25}
+                    }
+                },
+                "severity": "ERROR",
+                "source": {"name": "test_no_range"},
+                "original_output": "Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Terraform. Remove the quotes around \"string\"."
+            })
+        );
+        Ok(())
+    }
 }
