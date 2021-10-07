@@ -52,7 +52,13 @@ jobs:
       - name: Download all built artifacts
         uses: actions/download-artifact@v2
         with:
-          path: binaries
+          path: artifacts
 
       - name: Publish release
-        run: find binaries 
+        run: |
+          mkdir release
+          for binary_dir in artifacts/*
+          do
+            mv "${binary_dir}/tfv2rd" "release/$(basename $binary_dir)"
+          done
+          find release
