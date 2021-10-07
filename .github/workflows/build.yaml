@@ -1,6 +1,6 @@
 on:
   push:
-    branches: '*'
+    branches: main
     tags: v*
 
 name: Build
@@ -47,18 +47,22 @@ jobs:
     name: Release
     runs-on: ubuntu-20.04
     needs: build
-    # if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Download all built artifacts
         uses: actions/download-artifact@v2
         with:
           path: artifacts
 
-      - name: Publish release
+      - name: Rename artifacts
         run: |
           mkdir release
           for binary_dir in artifacts/*
           do
             mv "${binary_dir}/tfv2rd" "release/$(basename $binary_dir)"
           done
-          find release
+
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: release/tfv2rd-*
