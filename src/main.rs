@@ -287,14 +287,9 @@ mod tests {
             serde_json::from_str(TF_QUOTING).expect("Test data should be parsed");
         let all_diags = convert(&result, &Box::new(passthru_path), false, "test_quoting")
             .expect("Test data should be converted");
+        assert_eq!(all_diags.len(), 2, "Two diagnostics should be included");
         assert_eq!(
-            all_diags.len(),
-            2,
-            "Two diagnostics should be included"
-        );
-        assert_eq!(
-            serde_json::to_value(all_diags)
-                .expect("Converted data should be serialized"),
+            serde_json::to_value(all_diags).expect("Converted data should be serialized"),
             json!([
                 {
                     "message": "Invalid quoted type constraints",
