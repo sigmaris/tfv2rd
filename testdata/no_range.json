@@ -1,0 +1,39 @@
+{
+  "format_version": "0.1",
+  "valid": false,
+  "error_count": 2,
+  "warning_count": 0,
+  "diagnostics": [
+    {
+      "severity": "error",
+      "summary": "Could not load plugin",
+      "detail": "\nPlugin reinitialization required. Please run \"terraform init\".\n\nPlugins are external binaries that Terraform uses to access and manipulate\nresources. The configuration provided requires plugins which can't be located,\ndon't satisfy the version constraints, or are otherwise incompatible.\n\nTerraform automatically discovers provider requirements from your\nconfiguration, including providers used in child modules. To see the\nrequirements and constraints, run \"terraform providers\".\n\n2 problems:\n\n- failed to instantiate provider \"registry.terraform.io/hashicorp/aws\" to obtain schema: unknown provider \"registry.terraform.io/hashicorp/aws\"\n- failed to instantiate provider \"registry.terraform.io/hashicorp/random\" to obtain schema: unknown provider \"registry.terraform.io/hashicorp/random\"\n"
+    },
+    {
+      "severity": "error",
+      "summary": "Invalid quoted type constraints",
+      "detail": "Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Terraform. Remove the quotes around \"string\".",
+      "range": {
+        "filename": "variables.tf",
+        "start": {
+          "line": 8,
+          "column": 17,
+          "byte": 259
+        },
+        "end": {
+          "line": 8,
+          "column": 25,
+          "byte": 267
+        }
+      },
+      "snippet": {
+        "context": "variable \"deploy_environment\"",
+        "code": "  type        = \"string\"",
+        "start_line": 8,
+        "highlight_start_offset": 16,
+        "highlight_end_offset": 24,
+        "values": []
+      }
+    }
+  ]
+}

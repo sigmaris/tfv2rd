@@ -1,10 +1,10 @@
-on: [push, pull_request]
+on: pull_request
 
 name: Checks
 
 jobs:
-  check:
-    name: cargo check
+  test:
+    name: cargo test
     runs-on: ubuntu-20.04
     steps:
       - name: Checkout sources
@@ -17,10 +17,10 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Run cargo check
+      - name: Run cargo test
         uses: actions-rs/cargo@v1
         with:
-          command: check
+          command: test
 
   lints:
     name: Linters
@@ -37,10 +37,16 @@ jobs:
           override: true
           components: rustfmt, clippy
 
-      - name: Install reviewdog
-        uses: reviewdog/action-setup@v1
+      - name: Run cargo fmt
+        uses: actions-rs/cargo@v1
         with:
-          reviewdog_version: latest
+          command: fmt
+          args: --all
+
+      - name: Install reviewdog and suggest formatting changes
+        uses: reviewdog/action-suggester@v1
+        with:
+          tool_name: rustfmt
 
       - name: Install clippy-reviewdog-filter
         run: |
@@ -59,14 +65,4 @@ jobs:
           else
             REPORTER="github-check"
           fi
-          cargo clippy --message-format json 2>&1 | clippy-reviewdog-filter | reviewdog -f=checkstyle -reporter=$REPORTER
-
-      - name: Run cargo fmt
-        uses: actions-rs/cargo@v1
-        with:
-          command: fmt
-          args: --all
-
-      - uses: reviewdog/action-suggester@v1
-        with:
-          tool_name: rustfmt
+          cargo clippy --message-format json 2>&1 | clippy-reviewdog-filter | reviewdog -f=checkstyle -name="clippy" -reporter=$REPORTER

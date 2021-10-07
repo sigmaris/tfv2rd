@@ -1,0 +1,60 @@
+{
+  "format_version": "0.1",
+  "valid": false,
+  "error_count": 2,
+  "warning_count": 0,
+  "diagnostics": [
+    {
+      "severity": "error",
+      "summary": "Invalid quoted type constraints",
+      "detail": "Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Terraform. Remove the quotes around \"string\".",
+      "range": {
+        "filename": "variables.tf",
+        "start": {
+          "line": 2,
+          "column": 17,
+          "byte": 44
+        },
+        "end": {
+          "line": 2,
+          "column": 25,
+          "byte": 52
+        }
+      },
+      "snippet": {
+        "context": "variable \"deploy_context\"",
+        "code": "  type        = \"string\"",
+        "start_line": 2,
+        "highlight_start_offset": 16,
+        "highlight_end_offset": 24,
+        "values": []
+      }
+    },
+    {
+      "severity": "error",
+      "summary": "Invalid quoted type constraints",
+      "detail": "Terraform 0.11 and earlier required type constraints to be given in quotes, but that form is now deprecated and will be removed in a future version of Terraform. Remove the quotes around \"string\".",
+      "range": {
+        "filename": "variables.tf",
+        "start": {
+          "line": 8,
+          "column": 17,
+          "byte": 259
+        },
+        "end": {
+          "line": 8,
+          "column": 25,
+          "byte": 267
+        }
+      },
+      "snippet": {
+        "context": "variable \"deploy_environment\"",
+        "code": "  type        = \"string\"",
+        "start_line": 8,
+        "highlight_start_offset": 16,
+        "highlight_end_offset": 24,
+        "values": []
+      }
+    }
+  ]
+}
