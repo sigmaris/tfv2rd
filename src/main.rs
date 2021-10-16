@@ -353,4 +353,30 @@ mod tests {
                 .expect("DiagnosticResult conforms to RdJSON schema");
         }
     }
+
+    #[test]
+    fn test_make_path_converter_workdir() {
+        let path_converter = make_path_converter(&Opt {
+            basedir: None,
+            workdir: Some("/abs/example/dir".into()),
+            skip_errors: false,
+            format: OutputFormat::RdJsonL,
+            source: "test".to_string(),
+        }).expect("can create path_converter");
+        assert_eq!(path_converter(&"../somefile.tf").unwrap(), "/abs/example/somefile.tf");
+        assert_eq!(path_converter(&"sub/dir/somefile.tf").unwrap(), "/abs/example/dir/sub/dir/somefile.tf");
+    }
+
+    #[test]
+    fn test_make_path_converter_relativize() {
+        let path_converter = make_path_converter(&Opt {
+            basedir: Some("/abs/example".into()),
+            workdir: Some("/abs/example/dir".into()),
+            skip_errors: false,
+            format: OutputFormat::RdJsonL,
+            source: "test".to_string(),
+        }).expect("can create path_converter");
+        assert_eq!(path_converter(&"../somefile.tf").unwrap(), "somefile.tf");
+        assert_eq!(path_converter(&"sub/dir/somefile.tf").unwrap(), "dir/sub/dir/somefile.tf");
+    }
 }
