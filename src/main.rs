@@ -47,12 +47,12 @@ struct Opt {
     /// Working directory terraform validate was run in, for path conversion.
     workdir: Option<PathBuf>,
 
-    #[structopt(short, long)]
+    #[structopt(long)]
     /// Omit diagnostics in the output if errors are encountered converting them to Reviewdog format, instead of exiting with an error.
     skip_errors: bool,
 
     #[structopt(short, long, default_value = "rdjsonl")]
-    /// Format for output, either RdJSONL (one JSON Diagnostic object per line, default) or RdJSON (a single RdJSON object).
+    /// Format for output, either rdjsonl (one JSON Diagnostic object per line, default) or rdjson (a single RdJSON object).
     format: OutputFormat,
 
     #[structopt(short, long, default_value = "terraform validate")]
