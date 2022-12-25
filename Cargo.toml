@@ -3,8 +3,12 @@ name = "tfv2rd"
 version = "0.1.0"
 authors = ["Hugh Cole-Baker <sigmaris@gmail.com>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+description = "A tool to read Terraform validate JSON output (on stdin) and output Reviewdog Diagnostic JSON format (on stdout)"
+repository = "https://github.com/sigmaris/tfv2rd/"
+license = "MIT"
+exclude = [
+    ".github/*",
+]
 
 [dependencies]
 pretty_env_logger = "0.4"
