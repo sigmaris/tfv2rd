@@ -48,21 +48,14 @@ jobs:
         with:
           tool_name: rustfmt
 
-      - name: Install clippy-reviewdog-filter
-        run: |
-          mkdir -p "$HOME/.local/bin"
-          echo "$HOME/.local/bin" >> $GITHUB_PATH
-          curl -fSL https://github.com/qnighy/clippy-reviewdog-filter/releases/download/v0.1.1/clippy-reviewdog-filter-$(uname -m)-unknown-linux-musl -o "$HOME/.local/bin/clippy-reviewdog-filter"
-          chmod +x "$HOME/.local/bin/clippy-reviewdog-filter"
-
       - name: Run cargo clippy
         env:
           REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]
+          if [ "$GITHUB_EVENT_NAME" == "pull_request" ]
           then
             REPORTER="github-pr-check"
           else
             REPORTER="github-check"
           fi
-          cargo clippy --message-format json 2>&1 | clippy-reviewdog-filter | reviewdog -f=checkstyle -name="clippy" -reporter=$REPORTER
+          cargo clippy -q --message-format=short | reviewdog -f=clippy -reporter=$REPORTER
