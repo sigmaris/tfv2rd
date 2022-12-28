@@ -1,0 +1,20 @@
+on: pull_request
+
+name: Example
+
+jobs:
+  examplejob:
+    name: Example Job
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - name: Setup Reviewdog
+        uses: reviewdog/action-setup@v1
+      - name: Report example Reviewdog errors
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ github.token }}
+        run: |
+          NO_LOCATION_ERROR='{"message": "Could not load plugin","severity": "ERROR","source": {"name": "example_no_range"},"original_output": "Plugin reinitialization required. Please run \"terraform init\".\n\nPlugins are external binaries that Terraform uses to access and manipulate\nresources. The configuration provided requires plugins which can''t be located,\ndon''t satisfy the version constraints, or are otherwise incompatible.\n\nTerraform automatically discovers provider requirements from your\nconfiguration, including providers used in child modules. To see the\nrequirements and constraints, run \"terraform providers\".\n\n2 problems:\n\n- failed to instantiate provider \"registry.terraform.io/hashicorp/aws\" to obtain schema: unknown provider \"registry.terraform.io/hashicorp/aws\"\n- failed to instantiate provider \"registry.terraform.io/hashicorp/random\" to obtain schema: unknown provider \"registry.terraform.io/hashicorp/random\"."}'
+          REGULAR_ERROR='{"message": "Example error with location","location": {"path": ".github/workflows/example.yaml","range": {"start": {"line": 8,"column": 14},"end": {"line": 8, "column": 26}}},"severity": "ERROR","source": {"name": "example_no_range"},"original_output": "Example of a reviewdog result with a location in the same set."}'
+          printf '%s\n%s\n' "$NO_LOCATION_ERROR" "$REGULAR_ERROR" | reviewdog -f=rdjsonl -name='Example Job' -reporter=github-pr-check
